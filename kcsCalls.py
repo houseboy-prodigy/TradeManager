@@ -1,16 +1,19 @@
 from kucoin_futures.client import Trade
 from kucoin_futures.client import Market
+import makefile as mk
 
-'''
-client = Market(url='https://api-sandbox-futures.kucoin.com')
-api_key = '630fe5b137a609000198dad4'
-api_secret = '10ec6fd4-1dcd-447b-b0cf-521aab359bd7'
-api_passphrase = 'SepactMfdst1114'
-'''
+makeFileObject = mk.safeHello()
+data = makeFileObject.decrypt()
+
+key1 = str(data[0], encoding='utf-8')
+key2 = str(data[1], encoding='utf-8')
+key3 = str(data[2], encoding='utf-8')
+
 client = Market(url='https://api-futures.kucoin.com')
-api_key = '634b944da99b0c00016f4c02'
-api_secret = 'fb43171f-1aad-4418-8577-0ce672b308c6'
-api_passphrase = 'SepactMfdst1114'
+api_key = key1
+api_secret = key2
+api_passphrase = key3
+
 client_trade = Trade(key=api_key, secret=api_secret, passphrase=api_passphrase,is_sandbox=False, url='https://api-futures.kucoin.com')
 
 class kcscalls(object):
@@ -60,6 +63,8 @@ class kcscalls(object):
         #order_id = client_trade.create_limit_order(symbol=symbol, type='limit', side=side, amount=amount, price=price, params=params)
         return order_id
 
+    def checkLimitOrderStatus(self, orderId):
+        return client_trade.get_order_details(orderId)
 if __name__ == "__main__":
 
     #cancel orders
