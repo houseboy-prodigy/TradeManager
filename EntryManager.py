@@ -84,7 +84,7 @@ def tradeCallToKCS(tradeObj):
             #add stop order
             print(order_id)
             print('Order Confirmed,scenario3b')
-        stop_order_id = client_trade.create_limit_order(trade_pair, trade_side_reverse(trade_side), trade_leverage, lot_quantity, stop_loss)
+        #stop_order_id = client_trade.create_limit_order(trade_pair, trade_side_reverse(trade_side), trade_leverage, lot_quantity, stop_loss)
 
     elif(trade_side == 'sell'):
         if(price <= entryLower and price>= entryUpper):
@@ -100,8 +100,8 @@ def tradeCallToKCS(tradeObj):
             order_id = client_trade.create_limit_order(trade_pair, trade_side, trade_leverage, lot_quantity, price)
             print('Order Confirmed,scenario3s')
         params = {'stop': 'loss', 'stopPrice': 1500 , 'stopPriceType': 'TP'}
-        stop_order_id = client_trade.create_stop_order(trade_pair, trade_side, trade_leverage, lot_quantity, price,params)
-
+        #stop_order_id = client_trade.create_stop_order(trade_pair, trade_side, trade_leverage, lot_quantity, price,params)
+        stop_order_id = 'helo'
     tradeObj['size'] = lot_quantity
     return order_id,stop_order_id,tradeObj
 
