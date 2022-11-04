@@ -8,15 +8,16 @@ from telethon.errors import SessionPasswordNeededError
 from telethon import TelegramClient, events, sync
 from telethon.tl.functions.messages import (GetHistoryRequest)
 from kucoin_futures.client import Market
-import curr_price_data
+import threading
+import multithread
 import messageprocess
-import Enter_trade
-import Trade_manager
+import controlCenter
 from telethon.tl.types import (
-PeerChannel
+    PeerChannel
 )
 
 from telethon import TelegramClient
+
 '''
 api_id = 12223282
 api_hash = 'dd27c92671e9b82b788c8b7d93716032'
@@ -35,20 +36,27 @@ with client:
 api_id = 12223282
 api_hash = 'dd27c92671e9b82b788c8b7d93716032'
 
-
 client = TelegramClient('anon3', api_id, api_hash)
 
 # Here you define the target channel that you want to listen to:
 user_input_channel = 'https://t.me/autotrigger'
 
+async def sendMessage(message):
+    # Now you can use all client methods listed below, like for example...
+    await client.send_message(user_input_channel, message)
+def runProcess(message):
+    while True:
+        print(message)
+        time.sleep(3)
 @client.on(events.NewMessage(chats=user_input_channel))
 async def NewMessageListener(event):
-	message = event.message.message
-	tradeObj = messageprocess.processMessage(message)
-	print(tradeObj)
-	opened_position_order,stop_loss_order,tradeObject_with_more_details = Enter_trade.tradeCallToKCS(tradeObj)
-	(print(opened_position_order,stop_loss_order,tradeObject_with_more_details))
-	'''
+    message = event.message.message
+    await sendMessage('got a trade message....running dreamerbot')
+    #adding multithreading -
+    thread = threading.Thread(target=controlCenter.dreamerEntryBot, args=(message,))
+    thread.start()
+    #controlCenter.dreamerBot(message)
+    '''
 	while True:
 		status = Enter_trade.checkLimitOrderStatus(opened_position_order,stop_loss_order)
 		if(status == 'order_executed'):
@@ -58,6 +66,7 @@ async def NewMessageListener(event):
 		else:
 			time.sleep(10)
 	'''
-	
+
+
 with client:
-	client.run_until_disconnected()
+    client.run_until_disconnected()

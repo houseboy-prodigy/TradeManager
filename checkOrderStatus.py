@@ -9,11 +9,12 @@ def checkOrderStatus(opened_position_order, tradeObj):
     while True:
         orderDetails = client_trade.checkLimitOrderStatus(opened_position_order)
         status = orderDetails['status']
+        orderstr = str(opened_position_order)
         if (status == 'done'):
             print('order_executed')
             break
         else:
-            print(status)
+            print(status+orderstr)
             time.sleep(10)
 
 def checkOrderStatusWithSL(opened_position_order, sl_position_order,tradeObj):

@@ -13,17 +13,15 @@ import TradeManager as TM
 import kcscalls as kc
 import checkOrderStatus as cos
 
-def dreamerBot(message):
+def dreamerEntryBot(message):
     tradeObj = messageprocess.processMessage(message)
-    tradeObj2 = {'Curr': 'XRP ', 'TP': ['0.4575', '0.4578', '0.4546', '0.4476', '0.4406', '0.4313'],
-                'SL': '0.4560', 'entry': ['0.4565 ', ' 0.4441'], 'side': 'buy', 'size': 2}
+    print(f"******Message Processed from telegram: {tradeObj}******")
 
     client_trade = kc.kcscalls('params')
     TradeManager = TM.TradeManager(tradeObj, client_trade)
 
     opened_position_order_details, tradeObject_with_more_details = EntryManager.tradeCallToKCS(tradeObj)
     print(f'opened_position_order_details: {opened_position_order_details}')
-
     #opened_position_order = ''
     cos.checkOrderStatus(opened_position_order_details['orderId'],tradeObj)
     trade_pair = tradeObj['Curr'].strip() + 'USDTM'
@@ -39,6 +37,10 @@ def dreamerBot(message):
             break
 
     print(f'Dreamer bot done! details of position:{client_trade.get_position_details(trade_pair)}')
+
+def dreamerTradeManagerBot(message):
+    print(f"******Message Processed from telegram: {tradeObj}******")
+
 #sample tradeObj = {'Curr': 'XRP ', 'TP': ['0.4640', '0.4594', '0.4546', '0.4476', '0.4406', '0.4313'], 'SL': '0.4920', 'entry': ['0.4688 ', ' 0.4780'], 'side': 'sell'}
 #tradeObj2 = {'Curr': 'ADA ', 'TP': ['0.4121', '0.4594', '0.4546', '0.4476', '0.4406', '0.4313'],'SL': '0.34', 'entry': ['0.3912 ', ' 0.3800'], 'side': 'buy'}
 if __name__ == "__main__":
