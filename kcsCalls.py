@@ -27,6 +27,7 @@ class kcscalls(object):
 
     def __init__(self,tradeObj):
         self.tradeObj = tradeObj
+        self.clientt = client_trade
 
     def cancelLimitOrders(self,curr):
         client_trade.cancel_all_limit_order(curr)
@@ -59,9 +60,33 @@ class kcscalls(object):
     #    pass
 
     def create_stop_order(self,trade_pair,trade_side,trade_leverage,lot_quantity,price,params):
-        order_id = client_trade.create_limit_order(trade_pair, self.trade_side_reverse(trade_side), trade_leverage, lot_quantity, price,params=params)
-        #order_id = client_trade.create_limit_order(symbol=symbol, type='limit', side=side, amount=amount, price=price, params=params)
+        order_id = client_trade.create_limit_order(
+            symbol=trade_pair,
+            side=trade_side,
+            lever=trade_leverage,
+            size=lot_quantity,
+            price=price,
+            stop=params['stop'],
+            stopPrice=params['stopPrice'],  # When the price is reached, it will enter the orderbook and the funds will be frozen
+            stopPriceType='MP',
+        )
         return order_id
+
+    def create_stop_market_order(self, trade_pair, trade_side, trade_leverage, lot_quantity, params):
+        order_id = client_trade.create_market_order(
+                symbol=trade_pair,
+                side=trade_side,
+                lever=trade_leverage,
+                size=lot_quantity,
+                stop=params['stop'],
+                stopPrice=params['stopPrice'],
+                # When the price is reached, it will enter the orderbook and the funds will be frozen
+                stopPriceType='MP',
+        )
+        return order_id
+
+    def get_position_details(self,symbol):
+        return client_trade.get_position_details(symbol)
 
     def checkLimitOrderStatus(self, orderId):
         return client_trade.get_order_details(orderId)
@@ -70,12 +95,40 @@ if __name__ == "__main__":
     #cancel orders
     #print(client_trade.cancel_all_limit_order('ADAUSDTM'))
     #print(client_trade.cancel_order('634b3bd62b968a0001bf1134'))
-    tradeobj = (client_trade.get_position_details('CHZUSDTM'))
-    print(tradeobj)
+    #print(client_trade.get_position_details('XRPUSDTM'))
+    print(client_trade.get_order_details('636460c0a0d0250001b7795c'))
+    ''' - stop loss order
+    order = client_trade.create_limit_order(
+        symbol='XRPUSDTM',
+        side='sell',
+        lever=1,
+        size='1',
+        price='0.4540',
+        stop='down',
+        stopPrice='0.4545',  # When the price is reached, it will enter the orderbook and the funds will be frozen
+        stopPriceType='MP',
+    )
+    print(order)
+    '''
+
+    '''
+    #- stop loss market order
+    order = client_trade.create_market_order(
+        symbol='XRPUSDTM',
+        side='sell',
+        lever=1,
+        size='1',
+        stop='down',
+        stopPrice='0.4545',  # When the price is reached, it will enter the orderbook and the funds will be frozen
+        stopPriceType='MP',
+    )
+    print(order)
+
+    '''
     #pricetosell = (getPriceData('CHZUSDTM'))['price']
     #print(client_trade.get_order_details('634b3bd62b968a0001bf1134'))
     #print(getPriceData('CHZUSDTM'))
-
+    #print(client.get_contract_detail('XRPUSDTM'))
     #create_orders
     #print(client_trade.create_limit_order('CHZUSDTM', 'sell', 5, 2, pricetosell))
     #print(client_trade.create_market_order('CHZUSDTM','sell',5,size=1))

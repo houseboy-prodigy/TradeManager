@@ -103,7 +103,7 @@ def tradeCallToKCS(tradeObj):
         #stop_order_id = client_trade.create_stop_order(trade_pair, trade_side, trade_leverage, lot_quantity, price,params)
         stop_order_id = 'helo'
     tradeObj['size'] = lot_quantity
-    return order_id,stop_order_id,tradeObj
+    return order_id,tradeObj
 
 if __name__ == '__main__':
     print('')
