@@ -7,10 +7,10 @@ from telethon.errors import SessionPasswordNeededError
 from telethon import TelegramClient, events, sync
 from telethon.tl.functions.messages import (GetHistoryRequest)
 from kucoin_futures.client import Market
-import messageprocess
+import messageProcess
 import EntryManager
 import TradeManager as TM
-import kcscalls as kc
+import kcsCalls as kc
 import checkOrderStatus as cos
 
 def dreamerEntryBot(message):

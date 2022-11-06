@@ -9,8 +9,7 @@ from telethon import TelegramClient, events, sync
 from telethon.tl.functions.messages import (GetHistoryRequest)
 from kucoin_futures.client import Market
 import threading
-import multithread
-import messageprocess
+import messageProcess
 import controlCenter
 from telethon.tl.types import (
     PeerChannel

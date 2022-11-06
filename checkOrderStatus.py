@@ -1,5 +1,5 @@
 import TradeManager as tm
-import kcscalls as kc
+import kcsCalls as kc
 import time
 client_trade = kc.kcscalls('params')
 

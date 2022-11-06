@@ -3,11 +3,11 @@ import json
 import re
 import time
 import string as str
-import kcscalls as kc
+import kcsCalls as kc
 from telethon.errors import SessionPasswordNeededError
 from telethon import TelegramClient, events, sync
 from telethon.tl.functions.messages import (GetHistoryRequest)
-import messageprocess
+import messageProcess
 import asyncio
 from telethon.tl.types import (
 PeerChannel
