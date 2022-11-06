@@ -46,46 +46,36 @@ class TradeManager(object):
               f'{position_details}')
         print('***************************')
         current_quantity = position_details['currentQty']
-        tp_quantity = self.find_tp_quantity(tpnum,current_quantity)
+        tp_quantity = self.find_tp_strat(tpnum,current_quantity)
+        tp_quantity = round(tp_quantity)
         print(f'tp_quantity: {tp_quantity}')
         params = {'stop': 'down', 'stopPrice': sl}
         trade_side_reverse = self.trade_side_reverse(trade_side)
-        tp_order_id = self.client_trade.create_limit_order(trade_pair, trade_side_reverse, trade_leverage, tp_quantity, tp)
-        time.sleep(5)
-        sl_order_id = self.client_trade.create_stop_market_order(trade_pair,trade_side_reverse,trade_leverage,current_quantity,params)
-
+        if trade_side == 'buy':
+            tp_order_id = self.client_trade.create_limit_order(trade_pair, trade_side_reverse, trade_leverage, tp_quantity, tp)
+            time.sleep(5)
+            sl_order_id = self.client_trade.create_stop_market_order(trade_pair,trade_side_reverse,trade_leverage,current_quantity,params)
+        else:
+            params = {'stop': 'up', 'stopPrice': sl}
+            tp_quantity = abs(tp_quantity)
+            current_quantity = abs(current_quantity)
+            tp_order_id = self.client_trade.create_limit_order(trade_pair, trade_side_reverse, trade_leverage,
+                                                               tp_quantity, tp)
+            time.sleep(5)
+            sl_order_id = self.client_trade.create_stop_market_order(trade_pair, trade_side_reverse, trade_leverage,
+                                                                     current_quantity, params)
         return tp_order_id, sl_order_id
 
     def createTradeStats(self):
         pass
 
-    '''
-    def place_order_and_check_status(self, curr, side, lev, tp, sl):
-        tp_order_id = self.client_trade.create_limit_order(curr, side, lev, 1, tp)
-        #sl_order_id = self.client_trade.create_limit_order(curr, side, lev, 1, sl)
-        tp_or_sl = 0
-
-         loop for tp or sl hit after entry
-        while (True):
-            tp_details = self.client_trade.get_order_details(tp_order_id)
-            sl_details = self.client_trade.get_order_details(sl_order_id)
-            if (tp_details['status'] == 'done'):
-                tp_or_sl = 1
-                break
-            elif (sl_details['status' == 'done']):
-                break
-        
-        return tp_or_sl
-    '''
-
-    '''
-        def find_tp_quantity(self, tp_hit_num, current_qty):
+    def find_tp_strat(self, tp_hit_num, current_qty):
         if (tp_hit_num == 0):
-            return (current_qty* 0.25)
+            return (current_qty* 0.15)
         elif (tp_hit_num == 1):
-            return (current_qty* 0.30)
+            return (current_qty*0.25)
         elif (tp_hit_num == 2):
             return (current_qty* 0.35)
         else:
             return (current_qty * 0.10)
-    '''
+

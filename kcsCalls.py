@@ -95,8 +95,20 @@ if __name__ == "__main__":
     #cancel orders
     #print(client_trade.cancel_all_limit_order('ADAUSDTM'))
     #print(client_trade.cancel_order('634b3bd62b968a0001bf1134'))
-    #print(client_trade.get_position_details('XRPUSDTM'))
-    print(client_trade.get_order_details('636460c0a0d0250001b7795c'))
+    #print(client_trade.get_position_details('APEUSDTM'))
+
+    order = client_trade.create_market_order(
+        symbol='APEUSDTM',
+        side='buy',
+        lever=1,
+        size='10',
+        stop='up',
+        stopPrice='5.30',  # When the price is reached, it will enter the orderbook and the funds will be frozen
+        stopPriceType='MP',
+    )
+    print(order)
+
+    #print(client_trade.get_order_details('636703eceda1bc0001f22353'))
     ''' - stop loss order
     order = client_trade.create_limit_order(
         symbol='XRPUSDTM',

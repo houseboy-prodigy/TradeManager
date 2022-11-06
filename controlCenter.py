@@ -14,21 +14,27 @@ import kcscalls as kc
 import checkOrderStatus as cos
 
 def dreamerEntryBot(message):
-    tradeObj = messageprocess.processMessage(message)
-    print(f"******Message Processed from telegram: {tradeObj}******")
-
     client_trade = kc.kcscalls('params')
-    TradeManager = TM.TradeManager(tradeObj, client_trade)
 
-    opened_position_order_details, tradeObject_with_more_details = EntryManager.tradeCallToKCS(tradeObj)
-    print(f'opened_position_order_details: {opened_position_order_details}')
-    #opened_position_order = ''
-    cos.checkOrderStatus(opened_position_order_details['orderId'],tradeObj)
+    tradeObj = messageprocess.processMessage(message)
     trade_pair = tradeObj['Curr'].strip() + 'USDTM'
+
+    response = client_trade.get_position_details(trade_pair)
+    open_position = response['isOpen']
+    TradeManager = TM.TradeManager(tradeObj, client_trade)
+    if not open_position:
+        print(f"******Entry Message Processed from telegram: {tradeObj}******")
+
+
+        opened_position_order_details, tradeObject_with_more_details = EntryManager.tradeCallToKCS(tradeObj)
+        print(f'opened_position_order_details: {opened_position_order_details}')
+        #opened_position_order = ''
+        cos.checkOrderStatus(opened_position_order_details['orderId'],tradeObj)
+
     tp_arr = tradeObj['TP']
     sl = tradeObj['SL']
-    arr_index_len = len(tp_arr) - 1
-    for i in range(2):
+    arr_index_len = len(tp_arr)
+    for i in range(arr_index_len):
         tp_order_id, sl_order_id = TradeManager.manage_trade(tp_arr[i],i)
         print(f'TP orderid: {tp_order_id}, SL orderid: {sl_order_id}')
         what_hit = cos.checkOrderStatusWithSL(tp_order_id['orderId'], sl_order_id['orderId'], tradeObj)
@@ -46,24 +52,32 @@ def dreamerTradeManagerBot(message):
 if __name__ == "__main__":
     message = ''
     #tradeObject = messageprocess.processMessage(message)
-    tradeObj = {'Curr': 'XRP ', 'TP': ['0.4570', '0.4578', '0.4546', '0.4476', '0.4406', '0.4313'],
-                'SL': '0.4560', 'entry': ['0.4565 ', ' 0.4441'], 'side': 'buy', 'size': 2}
+    tradeObj = {'Curr': 'APE ', 'TP': ['5.00', '4.75', '28.42', '27.98', '27.54'], 'SL': '5.30',
+                'entry': ['5.15 ', ' 5.188'], 'side': 'sell'}
 
+
+
+    #{'Curr': 'KAVA ', 'TP': ['1.4483', '1.4625', '1.4770', '1.5056', '1.5486'], 'SL': '1.3598',
+    # 'entry': ['1.4340 ', ' 1.4000'], 'side': 'buy'}
     client_trade = kc.kcscalls('params')
+    trade_pair = tradeObj['Curr'].strip() + 'USDTM'
+    response = client_trade.get_position_details(trade_pair)
+    open_position = response['isOpen']
     TradeManager = TM.TradeManager(tradeObj, client_trade)
+    if not open_position:
+        print(f"******Entry Message Processed from telegram: {tradeObj}******")
 
-    #opened_position_order_details, tradeObject_with_more_details = EntryManager.tradeCallToKCS(tradeObj)
-    #print(f'opened_position_order_details: {opened_position_order_details}')
+        opened_position_order_details, tradeObject_with_more_details = EntryManager.tradeCallToKCS(tradeObj)
+        print(f'opened_position_order_details: {opened_position_order_details}')
+        # opened_position_order = ''
+        cos.checkOrderStatus(opened_position_order_details['orderId'], tradeObj)
 
-    #opened_position_order = opened_position_order_details['orderId']
-    #time.sleep(5)
-    #opened_position_order = ''
-    #cos.checkOrderStatus(opened_position_order,tradeObj)
     tp_arr = tradeObj['TP']
     sl = tradeObj['SL']
-    #arr_index_len = len(tp_arr) - 1
-    for i in range(1):
-        tp_order_id, sl_order_id = TradeManager.manage_trade(tp_arr[1],1)
+    arr_index_len = len(tp_arr)
+    time.sleep(5)
+    for i in range(arr_index_len):
+        tp_order_id, sl_order_id = TradeManager.manage_trade(tp_arr[i],i)
         print(f'TP orderid: {tp_order_id}, SL orderid: {sl_order_id}')
         what_hit = cos.checkOrderStatusWithSL(tp_order_id['orderId'],sl_order_id['orderId'],tradeObj)
         print(what_hit)

@@ -44,6 +44,14 @@ user_input_channel = 'https://t.me/autotrigger'
 async def sendMessage(message):
     # Now you can use all client methods listed below, like for example...
     await client.send_message(user_input_channel, message)
+
+def validateMessage(message):
+    lines = message.splitlines()
+    first_line = lines[0]
+    if(first_line.startswith('HIGH')):
+        return True
+    else:
+        return False
 def runProcess(message):
     while True:
         print(message)
@@ -51,21 +59,15 @@ def runProcess(message):
 @client.on(events.NewMessage(chats=user_input_channel))
 async def NewMessageListener(event):
     message = event.message.message
-    await sendMessage('got a trade message....running dreamerbot')
-    #adding multithreading -
-    thread = threading.Thread(target=controlCenter.dreamerEntryBot, args=(message,))
-    thread.start()
-    #controlCenter.dreamerBot(message)
-    '''
-	while True:
-		status = Enter_trade.checkLimitOrderStatus(opened_position_order,stop_loss_order)
-		if(status == 'order_executed'):
-			tradeMan1 = Trade_manager.TradeManager(tradeObject_with_more_details)
-		elif(status == 'sl_triggered'):
-			break
-		else:
-			time.sleep(10)
-	'''
+    message_validated = validateMessage(message)
+    if not message_validated:
+        print('wrong Message, only post signals')
+    else:
+        await sendMessage('got a trade message....running dreamerbot')
+        #adding multithreading -
+        thread = threading.Thread(target=controlCenter.dreamerEntryBot, args=(message,))
+        thread.start()
+        #controlCenter.dreamerBot(message)
 
 
 with client:

@@ -20,6 +20,7 @@ def checkOrderStatus(opened_position_order, tradeObj):
 def checkOrderStatusWithSL(opened_position_order, sl_position_order,tradeObj):
     {f"Loop to check orderstatus of open order: {opened_position_order} and stopOrder: {sl_position_order}"}
     TradeManager = tm.TradeManager(tradeObj,client_trade)
+    trade_pair = tradeObj['Curr'].strip() + 'USDTM'
     what_hit = ''
     while True:
         tpOrderDetails = client_trade.checkLimitOrderStatus(opened_position_order)
@@ -29,6 +30,9 @@ def checkOrderStatusWithSL(opened_position_order, sl_position_order,tradeObj):
         slstatus = slOrderDetails['status']
         if (slstatus == 'done'):
             what_hit = 'sl'
+            position_details = client_trade.get_position_details(trade_pair)
+            if(position_details['isOpen']):
+                print('sl triggered but position still open, do something')
             break
         elif(tpstatus == 'done'):
             what_hit = 'tp'
