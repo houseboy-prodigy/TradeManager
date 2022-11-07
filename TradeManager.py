@@ -39,14 +39,15 @@ class TradeManager(object):
         sl = self.tradeObj['SL']
         sl = self.get_updated_sl(sl,tpnum)
         print(f'tp_num: {tpnum}, updated sl: {sl}')
-        trade_leverage = 1
+        trade_leverage = 2
         tp_hit_num = tpnum
         position_details = self.client_trade.get_position_details(trade_pair)
         print('**************************\n'
               f'{position_details}')
         print('***************************')
         current_quantity = position_details['currentQty']
-        tp_quantity = self.find_tp_strat(tpnum,current_quantity)
+        positon_size = self.tradeObj['size']
+        tp_quantity = self.find_tp_strat(tpnum,positon_size)
         tp_quantity = round(tp_quantity)
         print(f'tp_quantity: {tp_quantity}')
         params = {'stop': 'down', 'stopPrice': sl}
@@ -71,9 +72,9 @@ class TradeManager(object):
 
     def find_tp_strat(self, tp_hit_num, current_qty):
         if (tp_hit_num == 0):
-            return (current_qty* 0.15)
+            return (current_qty* 0.5)
         elif (tp_hit_num == 1):
-            return (current_qty*0.25)
+            return (current_qty)
         elif (tp_hit_num == 2):
             return (current_qty* 0.35)
         else:
