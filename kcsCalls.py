@@ -29,8 +29,8 @@ class kcscalls(object):
         self.tradeObj = tradeObj
         self.clientt = client_trade
 
-    def cancelLimitOrders(self,curr):
-        client_trade.cancel_all_limit_order(curr)
+    def cancelLimitOrders(self,orderid):
+        client_trade.cancel_order(orderid)
 
 
     def demoTradeCalls(self):
@@ -53,8 +53,22 @@ class kcscalls(object):
         return 'buy' if side == 'sell' else 'sell'
 
     def create_limit_order(self,trade_pair,trade_side,trade_leverage,lot_quantity,price):
-        order_id = client_trade.create_limit_order(trade_pair, trade_side, trade_leverage, lot_quantity, price)
-        return order_id
+        try:
+            order_id = client_trade.create_limit_order(trade_pair, trade_side, trade_leverage, lot_quantity, price)
+            return order_id
+        except Exception as e:
+            print('error')
+            exceptionStr = str(e)
+            print(f'exception at kcscalls.py: {e}')
+            code = (exceptionStr[13:19])
+            if (code == '300003'):
+                return ('balInsuff')
+            elif (code == '100000'):
+                return 'decimalError'
+            elif code == '100001':
+                return 'quantityInvalid'
+            elif code == '429000':
+                return 'tooMany'
 
     #def create_market_order(tradeObj):
     #    pass
@@ -95,35 +109,40 @@ if __name__ == "__main__":
     #cancel orders
     #print(client_trade.cancel_all_limit_order('ADAUSDTM'))
     #print(client_trade.cancel_order('634b3bd62b968a0001bf1134'))
-    #print(client_trade.get_position_details('APEUSDTM'))
+    #print(client_trade.get_position_details('MATICUSDTM'))
+    try:
+        order = client_trade.create_limit_order(
+            symbol='MATICUSDTM',
+            side='buy',
+            lever=1,
+            size='3',
+            price='1.22',
+        )
+        print(order)
+    except Exception as e:
+        print('error')
+        exceptionStr = str(e)
+        print(e)
+        code = (exceptionStr[13:19])
+        if(code == '300003'):
+            print('bal insuff')
 
-    order = client_trade.create_market_order(
-        symbol='APEUSDTM',
-        side='buy',
-        lever=1,
-        size='10',
-        stop='up',
-        stopPrice='5.30',  # When the price is reached, it will enter the orderbook and the funds will be frozen
-        stopPriceType='MP',
-    )
-    print(order)
 
+
+'''
     #print(client_trade.get_order_details('636703eceda1bc0001f22353'))
-    ''' - stop loss order
+     #- stop loss order
     order = client_trade.create_limit_order(
-        symbol='XRPUSDTM',
+        symbol='MATICUSDTM',
         side='sell',
         lever=1,
         size='1',
-        price='0.4540',
-        stop='down',
-        stopPrice='0.4545',  # When the price is reached, it will enter the orderbook and the funds will be frozen
-        stopPriceType='MP',
+        price='1.22',
     )
     print(order)
-    '''
 
-    '''
+
+    
     #- stop loss market order
     order = client_trade.create_market_order(
         symbol='XRPUSDTM',
