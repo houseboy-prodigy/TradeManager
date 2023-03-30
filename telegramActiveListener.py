@@ -47,7 +47,7 @@ async def sendMessage(message):
 def validateMessage(message):
     lines = message.splitlines()
     first_line = lines[0]
-    if(first_line.startswith('HIGH')):
+    if(first_line.startswith('HIGH') or first_line.startswith('VERY')):
         return True
     else:
         return False

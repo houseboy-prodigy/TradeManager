@@ -46,7 +46,7 @@ def tradeCallToKCS(tradeObj):
     price = float(price_data['price'])
     contract_detail = client_trade.get_contract_detail(trade_pair)
     multiplier = contract_detail['multiplier']
-    print(trade_pair)
+    #print(trade_pair)
     #print(entryUpper)
     #print(entryLower)
 
@@ -70,36 +70,36 @@ def tradeCallToKCS(tradeObj):
 
             order_id = client_trade.create_limit_order(trade_pair, trade_side, trade_leverage, lot_quantity, price)
             #add stop order
-            print(order_id)
-            print('Order Confirmed,scenario1b')
+            #print(order_id)
+            #print('Order Confirmed,scenario1b')
 
         elif(price<=entryLower): #case where current price is less than the LowerEntry enter at current market price
             order_id = client_trade.create_limit_order(trade_pair, trade_side, trade_leverage, lot_quantity, price)
             #add stop order
-            print(order_id)
-            print('Order Confirmed,scenario2b')
+            #print(order_id)
+            #print('Order Confirmed,scenario2b')
             
         else: #case where current price is more than the HigherEntry, wait for entry place the limit order for upper entry
             order_id = client_trade.create_limit_order(trade_pair, trade_side, trade_leverage, lot_quantity, entryUpper)
             #add stop order
-            print(order_id)
-            print('Order Confirmed,scenario3b')
+            #print(order_id)
+            #print('Order Confirmed,scenario3b')
         #stop_order_id = client_trade.create_limit_order(trade_pair, trade_side_reverse(trade_side), trade_leverage, lot_quantity, stop_loss)
 
     elif(trade_side == 'sell'):
         if(price <= entryLower and price>= entryUpper):#case where current price is between than the entries,  enter at current market price
 
             order_id = client_trade.create_limit_order(trade_pair, trade_side, trade_leverage, lot_quantity, price)
-            print(order_id)
+            #print(order_id)
 
-            print('Order Confirmed,scenario1s')
+            #print('Order Confirmed,scenario1s')
         elif(price <= entryUpper):#case where current price is below the lowerentry(upperEntry=lowerEntry in short case),
             # enter at upperentry price
             order_id = client_trade.create_limit_order(trade_pair, trade_side, trade_leverage, lot_quantity, entryUpper)
-            print('Order Confirmed,scenario2s')
+            #print('Order Confirmed,scenario2s')
         else:#case where current price is
             order_id = client_trade.create_limit_order(trade_pair, trade_side, trade_leverage, lot_quantity, price)
-            print('Order Confirmed,scenario3s')
+            #print('Order Confirmed,scenario3s')
         params = {'stop': 'loss', 'stopPrice': 1500 , 'stopPriceType': 'TP'}
         #stop_order_id = client_trade.create_stop_order(trade_pair, trade_side, trade_leverage, lot_quantity, price,params)
         stop_order_id = 'helo'
