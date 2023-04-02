@@ -14,7 +14,7 @@ import controlCenter
 from telethon.tl.types import (
     PeerChannel
 )
-
+from dbOps import putTrad
 from telethon import TelegramClient
 
 '''
@@ -47,7 +47,7 @@ async def sendMessage(message):
 def validateMessage(message):
     lines = message.splitlines()
     first_line = lines[0]
-    if(first_line.startswith('HIGH')):
+    if(first_line.startswith('HIGH') or first_line.startswith('VERY')):
         return True
     else:
         return False
@@ -63,9 +63,17 @@ async def NewMessageListener(event):
         print('wrong Message, only post signals')
     else:
         await sendMessage('got a trade message....running dreamerbot')
+
+        tradeObj = messageProcess.processMessage(message)
+        curr = tradeObj['Curr']
+        trade_side = tradeObj['side']
+        tp = tradeObj['TP']
+        stop_loss = tradeObj['SL']
+        entryArr = tradeObj['entry']
+        putTrad(curr,entryArr,tp,stop_loss,trade_side)
         #adding multithreading -
-        thread = threading.Thread(target=controlCenter.dreamerEntryBot, args=(message,))
-        thread.start()
+        #thread = threading.Thread(target=controlCenter.dreamerEntryBot, args=(message,))
+        #thread.start()
         #controlCenter.dreamerBot(message)
 
 

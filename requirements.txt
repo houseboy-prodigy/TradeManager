@@ -1,0 +1,17 @@
+certifi==2022.12.7
+cffi==1.15.1
+charset-normalizer==2.0.12
+cryptography==40.0.0
+idna==3.4
+kucoin-futures-python==1.0.6
+pyaes==1.6.1
+pyasn1==0.4.8
+pycparser==2.21
+requests==2.27.1
+rsa==4.9
+Telethon==1.27.0
+urllib3==1.26.15
+websockets==9.1
+psycopg2-binary==2.9.5
+SQLAlchemy==2.0.7
+typing_extensions==4.5.0
