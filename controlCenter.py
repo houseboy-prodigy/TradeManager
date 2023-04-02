@@ -12,6 +12,7 @@ import EntryManager
 import TradeManager as TM
 import kcsCalls as kc
 import checkOrderStatus as cos
+#from dbOps import putTradeintoDB
 
 def dreamerEntryBot(message):
 
@@ -42,8 +43,10 @@ def dreamerEntryBot(message):
         what_hit = cos.checkOrderStatusWithSL(tp_order_id['orderId'], sl_order_id['orderId'], tradeObj)
         print(what_hit)
         if what_hit == 'sl':
+            #add db operation done = true
             break
-
+        #add db operation tp_hit = i+1
+    #add db operation done = true
     print(f'Dreamer bot done! details of position:{client_trade.get_position_details(trade_pair)}')
 
 
@@ -51,23 +54,25 @@ def dreamerEntryBotManual(tradeObj):
 
     client_trade = kc.kcscalls('params')
 
+    print(tradeObj)
     trade_pair = tradeObj['Curr'].strip() + 'USDTM'
 
     response = client_trade.get_position_details(trade_pair)
     open_position = response['isOpen']
-    #TradeManager = TM.TradeManager(tradeObj, client_trade)
+    TradeManager = TM.TradeManager(tradeObj, client_trade)
     if not open_position:
+        print(f"******Entry Message Processed from telegram: {tradeObj}******")
 
         opened_position_order_details, tradeObject_with_more_details = EntryManager.tradeCallToKCS(tradeObj)
-        return {"status": "success", "CustomerID": "done"}
-        #opened_position_order = ''
-        #cos.checkOrderStatus(opened_position_order_details['orderId'],tradeObj)
-    '''
+        print(f'opened_position_order_details: {opened_position_order_details}')
+        # opened_position_order = ''
+        cos.checkOrderStatus(opened_position_order_details['orderId'], tradeObj)
+
     tp_arr = tradeObj['TP']
     sl = tradeObj['SL']
     arr_index_len = len(tp_arr)
     for i in range(arr_index_len):
-        tp_order_id, sl_order_id = TradeManager.manage_trade(tp_arr[i],i)
+        tp_order_id, sl_order_id = TradeManager.manage_trade(tp_arr[i], i)
         print(f'TP orderid: {tp_order_id}, SL orderid: {sl_order_id}')
         what_hit = cos.checkOrderStatusWithSL(tp_order_id['orderId'], sl_order_id['orderId'], tradeObj)
         print(what_hit)
@@ -75,7 +80,6 @@ def dreamerEntryBotManual(tradeObj):
             break
 
     print(f'Dreamer bot done! details of position:{client_trade.get_position_details(trade_pair)}')
-    '''
 def dreamerTradeManagerBot(message):
     print(f"******Message Processed from telegram: {tradeObj}******")
 

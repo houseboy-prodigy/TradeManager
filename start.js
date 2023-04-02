@@ -78,41 +78,47 @@ function getPositionStatus(req, res) {
 }
 
 
-//http://localhost:3000/putTrade?curr=Cuu&entry=ava&tp=bfa&sl=afc&side=buy
+//http://localhost:3000/putTrade?curr=ARP&entry=21,23&tp=12,21&sl=43&side=buy
 app.get('/putTrade', function(req, res) {
   // Import the child_process module
   const { spawn } = require('child_process');
 
+  // Parse the entry and tp arrays from the query parameters
+  const entryString = req.query.entry || '';
+  const tpString = req.query.tp || '';
 
+  const entryArray = entryString.split(',').map(parseFloat);
+  const tpArray = tpString.split(',').map(parseFloat);
+
+  console.log('entryArray:', entryArray);
+  console.log('tpArray:', tpArray);
 
   // Spawn a new Python process and pass the arguments
-  const pythonProcess = spawn('python', ['./function_caller.py', "put", req.query.curr,req.query.entry, req.query.tp,
-  req.query.sl, req.query.side]);
+  const pythonArgs = ['./function_caller.py', "put", req.query.curr, JSON.stringify(entryArray), JSON.stringify(tpArray), req.query.sl, req.query.side];
+  console.log('Python arguments:', pythonArgs);
+  const pythonProcess = spawn('python', pythonArgs);
 
-  // Handle the output from the Python process
   pythonProcess.stdout.on('data', (data) => {
-    // Convert the JSON string to an object
-    const result = JSON.parse(data);
-    if (result.status === 'success') {
-      // Send the CustomerID value in the response
-      res.send(result.CustomerID);
-    } else {
-      // Send an error response with the error message
-      res.status(500).send(result.message);
-    }
+    console.log(`Output from Python process: ${data}`);
   });
 
-  // Handle errors from the Python process
   pythonProcess.stderr.on('data', (data) => {
     console.error(`Error from Python process: ${data}`);
-    res.status(500).send('Error executing Python function');
   });
 
-  // Handle the Python process completing
   pythonProcess.on('close', (code) => {
     console.log(`Python process exited with code ${code}`);
+    // Send a response back to the client when the Python process exits
+    if (code === 0) {
+      res.json({ status: 'success' });
+    } else {
+      res.status(500).json({ status: 'error', message: 'An error occurred while processing the request.' });
+    }
   });
 });
+
+
+
 
 //http://localhost:3000/enterTrade?curr=ARB&tp=0.941,0.950,0.959,0.978,1.006&sl=0.904&entry=0.932,0.920&side=buy
 app.get('/enterTrade', function(req, res) {
@@ -129,7 +135,7 @@ app.get('/enterTrade', function(req, res) {
     const result = JSON.parse(data);
     if (result.status === 'success') {
       // Send the tradeObj value in the response
-      res.send(result.tradeObj);
+      res.send(result.OrderID);
       return; // Return to prevent sending another response
     } else {
       // Send an error response with the error message
@@ -151,3 +157,36 @@ app.get('/enterTrade', function(req, res) {
 });
 
 
+app.get('/getAllTrades', (req, res) => {
+
+  const { spawn } = require('child_process');
+  const py = spawn('python3', ['function_caller.py', 'getAllTrades']);
+
+  let outputData = '';
+
+  // Handle the standard output (stdout) from the Python script
+  py.stdout.on('data', (data) => {
+    outputData += data.toString();
+  });
+
+  // Handle the error output (stderr) from the Python script
+  py.stderr.on('data', (data) => {
+    console.error('Python stderr: ' + data.toString());
+  });
+
+  // Send the data back to the client when the Python script is done
+py.on('close', (code) => {
+  console.log('Python process exited with code ' + code);
+
+  console.log('Raw output data: ', outputData); // Log the raw output data
+
+  try {
+    const fixedOutputData = outputData.replace(/'/g, '"');
+    const jsonData = JSON.parse(fixedOutputData);
+    console.log('Parsed JSON: ', jsonData);
+    res.json(jsonData);
+  } catch (err) {
+    res.status(500).send('Error parsing JSON from Python script: ' + err.message);
+  }
+});
+});

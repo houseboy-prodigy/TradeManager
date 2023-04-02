@@ -40,8 +40,10 @@ def tradeCallToKCS(tradeObj):
     stop_loss = tradeObj['SL']
     trade_leverage = 1
     entryArr = tradeObj['entry']
-    entryUpper = float(entryArr[0].replace(',',''))
-    entryLower = float(entryArr[1].replace(',',''))
+    entryUpper = entryArr[0]
+    entryLower = entryArr[1]
+    #entryUpper = float(entryArr[0].replace(',',''))
+    #entryLower = float(entryArr[1].replace(',',''))
     price_data = client_trade.getPriceData(trade_pair)
     price = float(price_data['price'])
     contract_detail = client_trade.get_contract_detail(trade_pair)
