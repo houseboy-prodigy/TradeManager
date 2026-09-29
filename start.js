@@ -11,9 +11,8 @@ app.use('/api', function(req, res, next) {
 	var allowed = !origin
 		|| origin.indexOf('http://127.0.0.1') === 0
 		|| origin.indexOf('http://localhost') === 0
-		|| origin.indexOf('http://trade.wisechoiceconsulting.org') === 0
-		|| origin.indexOf('https://trade.wisechoiceconsulting.org') === 0
-		|| origin.indexOf('https://wisechoiceconsulting.org') === 0;
+		|| origin.indexOf('https://wisechoiceconsulting.org') === 0
+		|| origin.indexOf('https://www.wisechoiceconsulting.org') === 0;
 	if (allowed && origin) {
 		res.setHeader('Access-Control-Allow-Origin', origin);
 	}
