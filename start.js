@@ -2,6 +2,90 @@
 // and creates its variable.
 var express = require('express');
 var app = express();
+var path = require('path');
+
+app.use(express.json());
+
+app.use('/api', function(req, res, next) {
+	var origin = req.headers.origin;
+	var allowed = !origin
+		|| origin.indexOf('http://127.0.0.1') === 0
+		|| origin.indexOf('http://localhost') === 0
+		|| origin.indexOf('http://trade.wisechoiceconsulting.org') === 0
+		|| origin.indexOf('https://trade.wisechoiceconsulting.org') === 0
+		|| origin.indexOf('https://wisechoiceconsulting.org') === 0;
+	if (allowed && origin) {
+		res.setHeader('Access-Control-Allow-Origin', origin);
+	}
+	res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+	res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+	res.setHeader('Vary', 'Origin');
+	if (req.method === 'OPTIONS') {
+		res.sendStatus(204);
+		return;
+	}
+	next();
+});
+
+function runWebTrade(command, payload) {
+	return new Promise(function(resolve, reject) {
+		var spawn = require('child_process').spawn;
+		var py = spawn('python3', [path.join(__dirname, 'web_trades.py'), command]);
+		var output = '';
+		var errors = '';
+
+		py.stdout.on('data', function(data) {
+			output += data.toString();
+		});
+		py.stderr.on('data', function(data) {
+			errors += data.toString();
+		});
+		py.on('error', reject);
+		py.on('close', function(code) {
+			var parsed;
+			try {
+				parsed = JSON.parse(output || '{}');
+			} catch (err) {
+				reject(new Error(errors || output || err.message));
+				return;
+			}
+			if (code !== 0) {
+				var failure = new Error(parsed.message || errors || 'Trade request failed.');
+				failure.statusCode = 400;
+				failure.body = parsed;
+				reject(failure);
+				return;
+			}
+			resolve(parsed);
+		});
+
+		py.stdin.end(payload ? JSON.stringify(payload) : '');
+	});
+}
+
+app.get('/api/trades', function(req, res) {
+	runWebTrade('list').then(function(data) {
+		res.json(data);
+	}).catch(function(err) {
+		res.status(err.statusCode || 500).json({ status: 'error', message: err.message });
+	});
+});
+
+app.post('/api/trades', function(req, res) {
+	runWebTrade('put', req.body).then(function(data) {
+		res.status(201).json(data);
+	}).catch(function(err) {
+		res.status(err.statusCode || 500).json({ status: 'error', message: err.message });
+	});
+});
+
+app.post('/api/signals/parse', function(req, res) {
+	runWebTrade('parse', req.body).then(function(data) {
+		res.json(data);
+	}).catch(function(err) {
+		res.status(err.statusCode || 500).json({ status: 'error', message: err.message });
+	});
+});
 
 // Creates a server which runs on port 3000 and
 // can be accessed through localhost:3000
