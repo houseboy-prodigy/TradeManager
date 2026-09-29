@@ -1,6 +1,7 @@
 from kucoin_futures.client import Trade
 from kucoin_futures.client import Market
 import makefile as mk
+import exceptions as exceptions
 
 makeFileObject = mk.safeHello()
 data = makeFileObject.decrypt()
@@ -62,13 +63,17 @@ class kcscalls(object):
             print(f'exception at kcscalls.py: {e}')
             code = (exceptionStr[13:19])
             if (code == '300003'):
-                return ('balInsuff')
+                print('balInsuff')
+                raise exceptions.BalanceError
             elif (code == '100000'):
-                return 'decimalError'
+                print('decimalError')
+                raise exceptions.DecimalError
             elif code == '100001':
-                return 'quantityInvalid'
+                print('quantityInvalid')
+                raise exceptions.QuantityError
             elif code == '429000':
-                return 'tooMany'
+                print('toomany')
+                raise exceptions.TooManyRequestsError
 
     #def create_market_order(tradeObj):
     #    pass

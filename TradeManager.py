@@ -51,6 +51,7 @@ class TradeManager(object):
         print(f'tp_quantity: {tp_quantity}')
         params = {'stop': 'down', 'stopPrice': sl}
         trade_side_reverse = self.trade_side_reverse(trade_side)
+
         if trade_side == 'buy':
             tp_order_id = self.client_trade.create_limit_order(trade_pair, trade_side_reverse, trade_leverage, tp_quantity, tp)
             time.sleep(5)

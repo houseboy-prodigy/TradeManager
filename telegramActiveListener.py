@@ -11,6 +11,7 @@ from kucoin_futures.client import Market
 import threading
 import messageProcess
 import controlCenter
+from exceptions import QuantityError
 from telethon.tl.types import (
     PeerChannel
 )
@@ -35,7 +36,7 @@ with client:
 api_id = 12223282
 api_hash = 'dd27c92671e9b82b788c8b7d93716032'
 
-client = TelegramClient('anon3', api_id, api_hash)
+client = TelegramClient('anon4', api_id, api_hash)
 
 # Here you define the target channel that you want to listen to:
 user_input_channel = 'https://t.me/autotrigger'
@@ -47,6 +48,7 @@ async def sendMessage(message):
 def validateMessage(message):
     lines = message.splitlines()
     first_line = lines[0]
+    print(first_line)
     if(first_line.startswith('HIGH') or first_line.startswith('VERY')):
         return True
     else:
@@ -75,6 +77,7 @@ async def NewMessageListener(event):
         #thread = threading.Thread(target=controlCenter.dreamerEntryBot, args=(message,))
         #thread.start()
         #controlCenter.dreamerBot(message)
+
 
 
 with client:

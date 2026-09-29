@@ -13,7 +13,19 @@ import TradeManager as TM
 import kcsCalls as kc
 import checkOrderStatus as cos
 #from dbOps import putTradeintoDB
+from exceptions import QuantityError
 
+api_id = 12223282
+api_hash = 'dd27c92671e9b82b788c8b7d93716032'
+
+client = TelegramClient('anon4', api_id, api_hash)
+
+# Here you define the target channel that you want to listen to:
+user_input_channel = 'https://t.me/autotrigger'
+
+async def sendMessage(message):
+    # Now you can use all client methods listed below, like for example...
+    await client.send_message(user_input_channel, message)
 def dreamerEntryBot(message):
 
     client_trade = kc.kcscalls('params')
@@ -26,13 +38,17 @@ def dreamerEntryBot(message):
     open_position = response['isOpen']
     TradeManager = TM.TradeManager(tradeObj, client_trade)
     if not open_position:
-        print(f"******Entry Message Processed from telegram: {tradeObj}******")
+        try:
+            print(f"******Entry Message Processed from telegram: {tradeObj}******")
 
 
-        opened_position_order_details, tradeObject_with_more_details = EntryManager.tradeCallToKCS(tradeObj)
-        print(f'opened_position_order_details: {opened_position_order_details}')
-        #opened_position_order = ''
-        cos.checkOrderStatus(opened_position_order_details['orderId'],tradeObj)
+            opened_position_order_details, tradeObject_with_more_details = EntryManager.tradeCallToKCS(tradeObj)
+            print(f'opened_position_order_details: {opened_position_order_details}')
+            #opened_position_order = ''
+            cos.checkOrderStatus(opened_position_order_details['orderId'],tradeObj)
+        except QuantityError as qe:
+            print('at qe')
+            raise QuantityError
 
     tp_arr = tradeObj['TP']
     sl = tradeObj['SL']
